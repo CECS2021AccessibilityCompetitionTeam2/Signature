@@ -18,7 +18,7 @@ def parse(text):
         result = []
         for word in translation[0]:
             result.append((word['text'].lower(), word['lemma'].lower()))
-        print("\nResult: ", result, "\n")
+        return result
 
         # display(translation)
 
@@ -41,8 +41,7 @@ def wordToDictionary(word):
 
 
 def getMeta(sentence):
-    # sentence.print_dependencies()
-    englishStruct = {}
+
     aslStruct = {
         'rootElements': [],
         'UPOS': {
@@ -50,19 +49,11 @@ def getMeta(sentence):
             'PART': [], 'PRON': [], 'PROPN': [], 'PUNCT': [], 'SCONJ': [], 'SYM': [], 'VERB': [], 'X': []
         }
     }
-    reordered = []
-    # aslStruct["rootElements"] = []
 
-    # Make a list of all tokenized words. This step might be unnecessary.
     words = []
     for token in sentence.tokens:
         for word in token.words:
 
-            # print(word.index, word.governor, word.text, word.lemma, word.upos,
-            #       word.dependency_relation)  # , word.feats)
-            # # Insert as dict
-            # words.append(wordToDictionary(word))
-            # Insertion sort
             j = len(words)
             for i, w in enumerate(words):
                 if word.head <= w['governor']:
@@ -72,32 +63,9 @@ def getMeta(sentence):
                     break
             # Convert to Python native structure when inserting.
             words.insert(j, wordToDictionary(word))
-    # # Python sort for converted words
-    # words.sort(key=attrgetter('governor', 'age')) # , reverse=True
-    # words.sort(key=words.__getitem__) # , reverse=True
+
     reordered = words
 
-    # Deprecated aslStruct code...
-    # While there exist words that haven't been added to the tree.
-    # englishStruct['root'] = wordToDictionary(words[0])
-    #     # Create list of words for each UPOS
-    #     aslStruct['UPOS'][word.upos].append(word)
-    #
-    # # Sort each UPOS list
-    # # print(aslStruct['UPOS'])
-    # for upos, uposList in aslStruct['UPOS'].items():
-    #   # print(upos, uposList)
-    #   uposList.sort(key=attrgetter('governor'))
-    #   print(upos, uposList)
-
-    # Identify Root Elements
-    # for word in token.words:
-    # if word.dependency_relation == "root":
-    # aslStruct["rootElements"].append(word)
-    # Get related elements
-    # Ident topics & comments
-
-    # print("\n", aslStruct, "\n")
     return reordered
 
 
@@ -214,11 +182,12 @@ def display(translation):
 
 
 def follow(thefile):
-    thefile.seek(0,2)
+    thefile.seek(0, 2)
     while True:
-        line = thefile.readline()
+        line = thefile.readline().strip('\n')
+        print(line)
         if not line:
-            time.sleep(0.1)
+            time.sleep(1)
             continue
         yield line
 
@@ -244,8 +213,28 @@ def main():
 
     logfile = open("transcript.md", "r")
     loglines = follow(logfile)
+
+    translate = False
+
     for line in loglines:
-        parse(line)
+        if translate:
+            Result = parse(line)
+            with open('output/output.md', 'w') as f:
+                for word in Result:
+                    f.write(word[1].upper() + " \n")
+            f.close()
+            translate = False
+
+        if line.strip() == "!asl":
+            print("Ayyy")
+            translate = True
+
+
+        # os.system('bash ./video_cache/getAllClips.sh output.md')
+
+        # subprocess.run(['C:\\Program Files\\Git\\git-bash.exe', '-l', ['getAllClips.sh', "testspeech.txt"]],
+        #                 cwd='C:\\Users\\Addie\\Documents\\Text-to-ASL\\video_cache')
+
 
 if __name__ == "__main__":
     main()
