@@ -99,12 +99,12 @@ def getLemmaSequence(meta):
             elif word['upos'] == 'PROPN':
                 fingerSpell = []
                 for letter in word['text'].lower():
-
                     spell = {}
                     spell['text'] = letter
                     spell['lemma'] = letter
                     # Add fingerspell as individual lemmas
                     fingerSpell.append(spell)
+                translation.extend(fingerSpell)
 
 
 
@@ -185,7 +185,6 @@ def follow(thefile):
     thefile.seek(0, 2)
     while True:
         line = thefile.readline().strip('\n')
-        print(line)
         if not line:
             time.sleep(1)
             continue
@@ -209,7 +208,7 @@ def main():
     #
     # for text in tests:
     #     print("Text to process: ", text, "\n")
-    #     parse(text)
+    #     print(parse(text))
 
     logfile = open("transcript.md", "r")
     loglines = follow(logfile)
@@ -226,14 +225,13 @@ def main():
             translate = False
 
         if line.strip() == "!asl":
-            print("Ayyy")
             translate = True
 
 
         # os.system('bash ./video_cache/getAllClips.sh output.md')
 
-        # subprocess.run(['C:\\Program Files\\Git\\git-bash.exe', '-l', ['getAllClips.sh', "testspeech.txt"]],
-        #                 cwd='C:\\Users\\Addie\\Documents\\Text-to-ASL\\video_cache')
+        subprocess.run(['C:\\Program Files\\Git\\git-bash.exe', '-l', ['getAllClips.sh', "testspeech.txt"]],
+                        cwd='C:\\Users\\Addie\\Documents\\Text-to-ASL\\video_cache')
 
 
 if __name__ == "__main__":
